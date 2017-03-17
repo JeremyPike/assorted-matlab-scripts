@@ -36,10 +36,6 @@ if nargin < 3
     saveMosaics = true;
 end
 
-% Minimum percentage size difference between clones
-
-% Minimum distance between clones
-
 %% Load data and perform maximal projection
 display('Loading data ....')
 % Ask user to specify a directory
@@ -241,8 +237,8 @@ end
 
 % swap the red and blue channels for display purposes
 temp=mosaic(:,:,1);
-mosaic(:,:,1)=mosaic(:,:,2);
-mosaic(:,:,2)=temp;
+mosaic(:, :, 1)=mosaic(:, :, 2);
+mosaic(:, :, 2)=temp;
 
 % show the mosaic
 imshow(mosaic)
