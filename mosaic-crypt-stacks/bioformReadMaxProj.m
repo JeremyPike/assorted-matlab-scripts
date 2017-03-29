@@ -32,8 +32,15 @@ omeMeta = reader.getMetadataStore();
 
 % Empty array for stage coordinates
 planePosition = zeros(numSeries, 2);
-
+ 
+reverseStr ='';
 for i = 1 : numSeries
+    
+    % display progress message over the previous
+    msg = ['Reading series ' num2str(i) ' of ' num2str(numSeries)];
+    fprintf([reverseStr, msg]);
+    reverseStr = repmat(sprintf('\b'), 1, length(msg));
+    
     % Set the reader to the current series
     reader.setSeries(i - 1);
     
@@ -44,6 +51,15 @@ for i = 1 : numSeries
     numTimePoints = omeMeta.getPixelsSizeT(i - 1).getValue(); 
     numChannels = omeMeta.getPixelsSizeC(i - 1).getValue(); 
     
+    % check the data has three channel, 1 timepoint, and more than 1 slice
+    if (numChannels ~= 3 || numTimePoints ~=1 || numSlices < 2) 
+        fprintf('\nThe series has unexpected dimensions')
+        fprintf(['\nNumber of channels: ' num2str(numChannels)]) 
+        fprintf(['\nNumber of time-points: ' num2str(numTimePoints)]) 
+        fprintf(['\nNumber of slices: ' num2str(numSlices) '\n']) 
+        return
+    end
+  
     % Get stage coordiantes (convert to microns)
     planePosition(i, 1) = omeMeta.getPlanePositionX(i - 1, 0).value() ... 
                         .doubleValue() * 10^6;
@@ -69,6 +85,7 @@ for i = 1 : numSeries
     dataSeriesMaxProj{i, 1} = squeeze(max(dataSeries, [], 3));
     
 end
+fprintf('\n')
 
 end
 

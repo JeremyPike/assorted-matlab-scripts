@@ -38,8 +38,10 @@ end
 
 %% Load data and perform maximal projection
 display('Loading data ....')
-% Ask user to specify a directory
-folderPath = uigetdir;
+% Ask user to specify a directory containing data
+folderPath = uigetdir('','Specify input data folder');
+% Ask user to specify a directory for saving the output tiled images
+outputFolderPath = uigetdir('','Specify output folder');
 % Set current folder to specified directory
 cd(folderPath);
 % Find all leica .lif files in the specified directory
@@ -102,8 +104,11 @@ for i = 1 : imageCount
         % Calculate areas of all connected components in binary iamge
         R = regionprops(bwconncomp(BW), 'Area');
         % Find the largest area
-        cloneSizes(i, 1) = max(cat(1, R.Area));
-        
+        if isempty(cat(1, R.Area)) == false
+            
+            cloneSizes(i, 1) = max(cat(1, R.Area));
+        end
+            
 end
 
 % find indexes for sorting by size in descending order
@@ -157,10 +162,14 @@ mosaicNonDup = ...
 figure
 mosaicDup = mosaicFigure(dataMaxProj, duplicate, orderedIndex, 20);
 
-% if requsted save mosaic images
+% find position of final '\' in input directory for output file names
+slashes = strfind(folderPath, '\');
+% if requsted save mosaic images 
 if saveMosaics
-    imwrite(mosaicNonDup,'mosaicData.tif','tif') 
-    imwrite(mosaicDup,'mosaicDuplicates.tif','tif') 
+    imwrite(mosaicNonDup,[outputFolderPath '\mosaicData_' ... 
+        folderPath(slashes(length(slashes)) + 1 : end) '.tif'], 'tif') 
+    imwrite(mosaicDup,[outputFolderPath '\mosaicDuplicates_' ... 
+        folderPath(slashes(length(slashes)) + 1 : end) '.tif'], 'tif') 
 end
 
 display('All done :)')
